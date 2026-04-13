@@ -28,8 +28,8 @@ terraform output
 | Resource | Terraform name | Notes |
 |---|---|---|
 | Resource Group | `azurerm_resource_group.main` | Primary RG in Sweden Central |
-| Container Registry | `azurerm_container_registry.main` | Premium SKU, zone-redundant (automatic) |
-| Geo-Replication | `azurerm_container_registry_replication.secondary` | West Europe replica |
+| Container Registry | `azurerm_container_registry.main` | Premium SKU, zone-redundant (automatic for all tiers in supported regions) |
+| Geo-Replication | inline `georeplications` block on ACR | West Europe replica — active-active via Traffic Manager |
 | Webhook | `azurerm_container_registry_webhook.push_events` | Push/delete notifications (disabled by default) |
 | Log Analytics Workspace | `azurerm_log_analytics_workspace.main` | 30-day retention |
 | Diagnostic Setting | `azurerm_monitor_diagnostic_setting.acr` | Routes login + repo events + metrics to LAW |
@@ -44,14 +44,14 @@ terraform output
 
 ## Alerts
 
-| Alert | Metric | Threshold |
+| Alert | Metric / Signal | Threshold |
 |---|---|---|
-| Storage Warning | StorageUsed | > 400 GiB |
-| Storage Critical | StorageUsed | > 475 GiB |
+| Storage Warning | StorageUsed (Average) | > 400 GiB |
+| Storage Critical | StorageUsed (Average) | > 475 GiB |
 | Pull Failures | ContainerRegistryRepositoryEvents (Pull, non-200) | > 10 / 5 min |
 | Push Failures | ContainerRegistryRepositoryEvents (Push, non-200) | > 5 / 5 min |
-| Registry Deleted | Activity Log | Any delete operation |
-| Service Health | Activity Log | Incident or Maintenance |
+| Registry Deleted | Activity Log | Any delete operation — Sev 0 |
+| Service Health | Activity Log | Incident or Maintenance — Sev 1 |
 
 ## Deployment Flow
 
@@ -65,3 +65,12 @@ terraform output
 8. Check Azure Monitor > Alerts — all 6 alerts should be active
 9. Check Azure Monitor > Workbooks > "acrops ACR Monitoring"
 10. Review `docs/operations.md` and share with your team
+
+## Key Quirks
+
+- **Zone redundancy is automatic for all tiers (2025):** The `zoneRedundancy` ARM property may show `Disabled` — this is a legacy artifact. Zone redundancy is active in all supported regions. The `zone_redundancy_enabled = true` Terraform setting is harmless but redundant.
+- **`prevent_destroy` is commented out** — intentional for this demo repo. Enable it for production.
+- **Soft delete is incompatible with geo-replication** — cannot enable both simultaneously.
+- **Pull/push failure alerts use Log Analytics** (KQL-based), not metric alerts — Azure Monitor cannot compute `Total - Successful` in a single metric expression.
+- **Activity log alerts require `location = "global"`** on the Terraform resource.
+- **Service Health alert must be scoped to the subscription ID** — not the resource group or registry.

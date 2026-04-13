@@ -1,5 +1,5 @@
 resource "azurerm_application_insights_workbook" "acr_monitoring" {
-  name                = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+  name                = random_uuid.workbook.result
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   display_name        = "${var.prefix} ACR Monitoring"

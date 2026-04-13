@@ -143,9 +143,11 @@ AzureMetrics
 
 ### Zone redundancy details
 
-- Zone redundancy is **automatic** in supported regions — no configuration needed.
-- The `zoneRedundancy` property in portal/API may show `Disabled` — this is a legacy artifact and does not reflect actual behavior.
+- Zone redundancy is **automatic for all ACR tiers** (Basic, Standard, Premium) in regions that support availability zones — no configuration needed and no extra cost.
+- This became the default in 2025. Existing registries in supported regions were retroactively upgraded.
+- The `zoneRedundancy` property in portal/API may still show `Disabled` — this is a legacy artifact and does not reflect actual behavior. Your registry is zone-redundant regardless.
 - Zone redundancy applies to the **data plane** (push/pull). ACR Tasks do **not** support availability zones.
+- The `zone_redundancy_enabled = true` Terraform argument is now redundant but harmless — safe to leave in place.
 
 ### Geo-replication details
 
@@ -241,14 +243,14 @@ ACR geo-replication provides built-in multi-region resilience:
 You can test failover by temporarily removing a geo-replica:
 
 ```bash
-# 1. Remove secondary replica (simulates region outage)
-az acr replication delete --registry <registry> --name westeurope
+# 1. Disable routing to secondary replica (non-destructive — simulates region outage)
+az acr replication update --registry <registry> --name westeurope --region-endpoint-enabled false
 
-# 2. Verify pulls still work from the remaining region
+# 2. Verify pulls still work from the remaining primary region
 docker pull <registry>.azurecr.io/<image>:<tag>
 
-# 3. Re-add the replica
-az acr replication create --registry <registry> --location westeurope
+# 3. Re-enable the replica
+az acr replication update --registry <registry> --name westeurope --region-endpoint-enabled true
 
 # 4. Verify replication status
 az acr replication list --registry <registry> --output table

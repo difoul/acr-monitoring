@@ -27,3 +27,8 @@ resource "random_string" "acr_suffix" {
   special = false
   upper   = false
 }
+
+# Stable random UUID for the Azure Monitor Workbook resource name.
+# Using a random UUID avoids hardcoding a GUID that can conflict on redeploy
+# in a different subscription or resource group.
+resource "random_uuid" "workbook" {}
