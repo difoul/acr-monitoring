@@ -21,9 +21,9 @@ variable "prefix" {
   }
 }
 
-variable "alert_email" {
-  description = "Email address for alert notifications"
-  type        = string
+variable "alert_emails" {
+  description = "List of email addresses for alert notifications"
+  type        = list(string)
 }
 
 variable "log_analytics_retention_days" {

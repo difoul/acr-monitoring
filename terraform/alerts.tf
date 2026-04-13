@@ -3,9 +3,12 @@ resource "azurerm_monitor_action_group" "main" {
   resource_group_name = azurerm_resource_group.main.name
   short_name          = substr(var.prefix, 0, 12)
 
-  email_receiver {
-    name          = "alert-email"
-    email_address = var.alert_email
+  dynamic "email_receiver" {
+    for_each = var.alert_emails
+    content {
+      name          = "alert-email-${email_receiver.key}"
+      email_address = email_receiver.value
+    }
   }
 }
 

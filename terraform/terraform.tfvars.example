@@ -10,8 +10,11 @@ secondary_location = "westeurope"
 # Short prefix for resource names (lowercase alphanumeric, max 8 chars)
 prefix = "acrops"
 
-# Email address for alert notifications (REQUIRED — no default)
-alert_email = "<your-email@example.com>"
+# List of email addresses for alert notifications (REQUIRED — no default)
+alert_emails = [
+  "oncall@example.com",
+  "team@example.com",
+]
 
 # Log Analytics retention in days (default: 30)
 # log_analytics_retention_days = 30

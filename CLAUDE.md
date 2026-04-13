@@ -55,7 +55,7 @@ terraform output
 
 ## Deployment Flow
 
-1. Copy `terraform/terraform.tfvars.example` to `terraform/terraform.tfvars` — fill in `alert_email`
+1. Copy `terraform/terraform.tfvars.example` to `terraform/terraform.tfvars` — fill in `alert_emails`
 2. `cd terraform && terraform init`
 3. `terraform plan` — review 15 resources
 4. `terraform apply`
