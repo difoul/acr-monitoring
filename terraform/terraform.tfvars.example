@@ -1,0 +1,21 @@
+# Copy this file to terraform.tfvars and fill in your values.
+# terraform.tfvars is gitignored — never commit real values.
+
+# Primary region — Sweden Central is cost-effective for EU workloads
+location = "swedencentral"
+
+# Secondary region for ACR geo-replication
+secondary_location = "westeurope"
+
+# Short prefix for resource names (lowercase alphanumeric, max 8 chars)
+prefix = "acrops"
+
+# Email address for alert notifications (REQUIRED — no default)
+alert_email = "<your-email@example.com>"
+
+# Log Analytics retention in days (default: 30)
+# log_analytics_retention_days = 30
+
+# Storage alert thresholds in GiB (defaults: 400 warning, 475 critical)
+# storage_alert_warning_gb  = 400
+# storage_alert_critical_gb = 475
